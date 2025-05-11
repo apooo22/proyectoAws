@@ -6,6 +6,12 @@ pipeline {
   }
 
   stages {
+    stage('Clonar repositorio desde GitHub') {
+      steps {
+        git credentialsId: 'github-token', url: 'https://github.com/apooo22/proyectoAws.git', branch: 'main'
+      }
+    }
+
     stage('Verificar estructura de archivos') {
       steps {
         sh 'ls -R'
@@ -14,22 +20,24 @@ pipeline {
 
     stage('Instalar dependencias Node.js') {
       steps {
-        dir('terraform/lambda') {
+        dir('despliegue/terraform/lambda') {
           sh 'npm install'
         }
       }
     }
 
-    stage('Compilar y empaquetar Lambda Java') {
-      steps {
-        sh 'mvn clean package -U'
-        sh 'cp target/ms-preventista-0.0.1.jar terraform/java/'
-      }
+ stage('Compilar y empaquetar Lambda Java') {
+  steps {
+    dir('despliegue/terraform/java') {
+      sh 'mvn clean package -U'
+      sh 'cp target/ms-preventista-0.0.1.jar ../'
     }
+  }
+}
 
     stage('Empaquetar Lambda Node.js') {
       steps {
-        dir('terraform/lambda') {
+        dir('despliegue/terraform/lambda') {
           sh 'zip lambda.zip lambda-handler.js'
         }
       }
@@ -37,7 +45,7 @@ pipeline {
 
     stage('Desplegar con Terraform') {
       steps {
-        dir('terraform') {
+        dir('despliegue/terraform') {
           sh 'terraform init'
           sh 'terraform apply -auto-approve'
         }
