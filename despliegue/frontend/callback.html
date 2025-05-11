@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Autenticación Cognito</title>
+</head>
+<body>
+  <h2>Resultado de autenticación</h2>
+  <pre id="resultado">Procesando...</pre>
+
+  <script>
+    const code = new URLSearchParams(window.location.search).get("code");
+
+    const clientId = "62h4v1vodgbp1be0gaqp86v75p";
+    const redirectUri = "http://localhost:5500/callback.html";
+    const domain = "demo-app-jliza2025.auth.us-east-2.amazoncognito.com";
+    const apiUrl = "https://os0b17l0vc.execute-api.us-east-2.amazonaws.com/prod/admin";
+
+    async function intercambiarCodePorToken(code) {
+      const body = new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: clientId,
+        code: code,
+        redirect_uri: redirectUri
+      });
+
+      const response = await fetch(`https://${domain}/oauth2/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: body
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al intercambiar code por token: ${errorText}`);
+      }
+
+      return response.json();
+    }
+
+    async function llamarApiProtegida(token) {
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("🔍 Respuesta de API protegida:", response.status);
+
+      const text = await response.text();
+      console.log("📄 Cuerpo:", text);
+
+      if (!response.ok) {
+        throw new Error(`Error al llamar a la API protegida: ${response.status}`);
+      }
+
+      return JSON.parse(text);
+    }
+
+    async function main() {
+      if (!code) {
+        document.getElementById("resultado").innerText = "No se recibió ningún código.";
+        return;
+      }
+
+      try {
+        const tokenResponse = await intercambiarCodePorToken(code);
+        const idToken = tokenResponse.id_token; // ⬅️ usar el id_token
+
+        console.log("🔑 ID Token:", idToken);
+
+        const datosProtegidos = await llamarApiProtegida(idToken);
+        document.getElementById("resultado").innerText = JSON.stringify(datosProtegidos, null, 2);
+
+      } catch (error) {
+        console.error("❌ Error:", error);
+        document.getElementById("resultado").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "ms-preventista-node",
+  "version": "1.0.0",
+  "description": "Lambda que simula recepción de pedido y envía a Kafka",
+  "main": "lambda-handler.js",
+  "scripts": {
+    "start": "node lambda-handler.js"
+  },
+  "dependencies": {
+    "kafkajs": "^1.16.0"
+  }
+}
