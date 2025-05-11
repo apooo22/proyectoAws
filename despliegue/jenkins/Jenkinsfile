@@ -14,7 +14,7 @@ pipeline {
 
     stage('Instalar dependencias Node.js') {
       steps {
-        dir('terraform/lambda') {
+        dir('despliegue/terraform/lambda') {
           sh 'npm install'
         }
       }
@@ -23,13 +23,13 @@ pipeline {
     stage('Compilar y empaquetar Lambda Java') {
       steps {
         sh 'mvn clean package -U'
-        sh 'cp target/ms-preventista-0.0.1.jar terraform/java/'
+        sh 'cp target/ms-preventista-0.0.1.jar despliegue/terraform/java/'
       }
     }
 
     stage('Empaquetar Lambda Node.js') {
       steps {
-        dir('terraform/lambda') {
+        dir('despliegue/terraform/lambda') {
           sh 'zip lambda.zip lambda-handler.js'
         }
       }
