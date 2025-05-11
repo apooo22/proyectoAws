@@ -6,6 +6,12 @@ pipeline {
   }
 
   stages {
+    stage('Clonar repositorio desde GitHub') {
+      steps {
+        git credentialsId: 'github-token', url: 'https://github.com/apooo22/proyectoAws.git', branch: 'main'
+      }
+    }
+
     stage('Verificar estructura de archivos') {
       steps {
         sh 'ls -R'
@@ -37,7 +43,7 @@ pipeline {
 
     stage('Desplegar con Terraform') {
       steps {
-        dir('terraform') {
+        dir('despliegue/terraform') {
           sh 'terraform init'
           sh 'terraform apply -auto-approve'
         }
