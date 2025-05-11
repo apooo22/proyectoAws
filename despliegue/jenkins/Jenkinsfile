@@ -26,12 +26,14 @@ pipeline {
       }
     }
 
-    stage('Compilar y empaquetar Lambda Java') {
-      steps {
-        sh 'mvn clean package -U'
-        sh 'cp target/ms-preventista-0.0.1.jar despliegue/terraform/java/'
-      }
+ stage('Compilar y empaquetar Lambda Java') {
+  steps {
+    dir('despliegue/terraform/java') {
+      sh 'mvn clean package -U'
+      sh 'cp target/ms-preventista-0.0.1.jar ../'
     }
+  }
+}
 
     stage('Empaquetar Lambda Node.js') {
       steps {
