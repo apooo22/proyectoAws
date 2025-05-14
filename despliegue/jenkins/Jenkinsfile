@@ -35,11 +35,12 @@ pipeline {
   }
 }
 
- stage('Compilar y empaquetar Lambda Java') {
-    dir('despliegue/terraform/java') {
+stage('Compilar y empaquetar Lambda Java') {
+    dir('despliegue/java') {
         sh 'mvn clean package -U'
     }
 }
+
 
 
     stage('Desplegar con Terraform') {
