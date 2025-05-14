@@ -35,13 +35,12 @@ pipeline {
   }
 }
 
-    stage('Empaquetar Lambda Node.js') {
-      steps {
-        dir('despliegue/terraform/lambda') {
-          sh 'zip lambda.zip lambda-handler.js'
-        }
-      }
+ stage('Compilar y empaquetar Lambda Java') {
+    dir('despliegue/terraform/java') {
+        sh 'mvn clean package -U'
     }
+}
+
 
     stage('Desplegar con Terraform') {
       steps {
